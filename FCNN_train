@@ -1,0 +1,39 @@
+# モジュール
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from keras.datasets import mnist
+from keras.utils import to_categorical
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# データのダウンロード
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+X_train = X_train.reshape(-1, 784).astype("float32") / 255.0
+X_test  = X_test.reshape(-1, 784).astype("float32") / 255.0
+y_train = to_categorical(y_train, 10)
+y_test  = to_categorical(y_test, 10)
+
+# 学習モデルの作成
+inputs = tf.keras.Input(shape=(784,), name="inp")
+x = tf.keras.layers.Dense(UNITS_FC1, activation="relu", name="fc1")(inputs)
+if UNITS_FC2 > 0:
+    x = tf.keras.layers.Dense(UNITS_FC2, activation="relu", name="fc2")(x)
+if UNITS_FC3 > 0:
+    x = tf.keras.layers.Dense(UNITS_FC3, activation="relu", name="fc3")(x)
+if UNITS_FC4 > 0:
+    x = tf.keras.layers.Dense(UNITS_FC4, activation="relu", name="fc4")(x)
+if UNITS_FC5 > 0:
+    x = tf.keras.layers.Dense(UNITS_FC5, activation="relu", name="fc5")(x)
+
+logits = tf.keras.layers.Dense(10, name="logits")(x)
+outputs = tf.keras.layers.Activation("softmax", name="softmax")(logits)
+model = tf.keras.Model(inputs, outputs)
+model.compile(optimizer="SGD", loss="categorical_crossentropy", metrics=["accuracy"])
+model.summary()
+
+# 学習の実行
+history = model.fit(X_train, y_train, epochs=EPOCHS, batch_size=32, verbose=1, validation_data=(X_test, y_test))
+test_acc = model.evaluate(X_test, y_test, verbose=0)[1]
+print("Test ACC:", test_acc)
+
